@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { Suspense  } from 'react';
 import { Spinner } from '@chakra-ui/react';
+import Sidebar from './components/Sidebar';
 
 const AppRoutes = () => (
   <BrowserRouter>
@@ -8,9 +9,11 @@ const AppRoutes = () => (
       <Route
         element={
           <>
-            <Suspense fallback={<Spinner />}>
-              <Outlet />
-            </Suspense>
+            <Sidebar>
+              <Suspense fallback={<Spinner />}>
+                <Outlet />
+              </Suspense>
+            </Sidebar>
           </>
         }
       >

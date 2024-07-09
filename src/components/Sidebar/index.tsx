@@ -16,7 +16,7 @@ import { Header } from './Header'
 
 
 interface ISidebar {
-    children: ReactNode
+    children?: ReactNode
 }
 
 interface ISidebarContent extends BoxProps {

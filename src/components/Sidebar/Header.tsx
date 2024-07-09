@@ -35,7 +35,8 @@ export const Header = ({ onOpen, ...rest }: IHeader) => {
         </Text>
   
         <HStack spacing={{ base: '0', md: '6' }}>
-          <IconButton size="lg" variant={"outline"} aria-label="open menu" onClick={toggleColorMode} icon={colorMode==='dark'? <FiSun/>: <FiMoon />} />
+          <IconButton size="lg" variant={"outline"} aria-label="change color mode" onClick={toggleColorMode} 
+          icon={colorMode==='dark'? <FiSun/>: <FiMoon />} />
         </HStack>
       </Flex>
     )

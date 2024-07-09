@@ -28,10 +28,10 @@ export const Header = ({ onOpen, ...rest }: IHeader) => {
   
         <Text
           display={{ base: 'flex', md: 'none' }}
-          fontSize="2xl"
-          fontFamily="monospace"
-          fontWeight="bold">
-          Vaci_Agendar
+          fontSize="3xl"
+          fontFamily="Barlow Condensed"
+          fontWeight="700">
+          <Text color={'facebook.400'} as={'span'}>Vaci_</Text>Agendar
         </Text>
   
         <HStack spacing={{ base: '0', md: '6' }}>

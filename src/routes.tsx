@@ -18,7 +18,7 @@ const AppRoutes = () => (
         }
       >
         <Route element={<>Pagina Inicial</>} path='/' />
-        <Route element={<>Lista</>} path='/list' />
+        <Route element={<>Incluir</>} path='/include' />
       </Route>
     </Routes>
   </BrowserRouter>

@@ -4,9 +4,9 @@ import { FiHome, FiTrendingUp } from "react-icons/fi"
 interface ILinkItemProps {
     name: string
     icon: IconType
+    href: string
 }
-
 export const LinkItems: Array<ILinkItemProps> = [
-    { name: 'Inicio', icon: FiHome },
-    { name: 'Cadastrar Agendamento', icon: FiTrendingUp },
+    { name: 'Inicio', icon: FiHome, href: '/'  },
+    { name: 'Cadastrar Agendamento', icon: FiTrendingUp, href: 'include' },
   ]

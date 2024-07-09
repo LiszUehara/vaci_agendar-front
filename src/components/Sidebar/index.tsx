@@ -35,13 +35,13 @@ const SidebarContent = ({ onClose, ...rest }: ISidebarContent) => {
       h="full"
       {...rest}>
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Vaci_Agendar
+        <Text fontSize="3xl" fontFamily="Barlow Condensed" fontWeight="700" fontStyle={"italic"}>
+          <Text color={'facebook.400'} as={'span'}>Vaci_</Text>Agendar
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
       {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
+        <NavItem key={link.name} icon={link.icon} href={link.href}>
           {link.name}
         </NavItem>
       ))}

@@ -1,16 +1,18 @@
 import { Box, Flex, FlexProps, Icon } from "@chakra-ui/react"
 import { IconType } from "react-icons"
+import { Link } from "react-router-dom"
 
 interface INavItemProps extends FlexProps {
     icon: IconType
     children: React.ReactNode
+    href: string
   }
   
-export const NavItem = ({ icon, children, ...rest }: INavItemProps) => {
+export const NavItem = ({ icon, children, href, ...rest }: INavItemProps) => {
     return (
       <Box
-        as="a"
-        href="#"
+        as={Link}
+        to={href}
         style={{ textDecoration: 'none' }}
         _focus={{ boxShadow: 'none' }}>
         <Flex
@@ -21,7 +23,7 @@ export const NavItem = ({ icon, children, ...rest }: INavItemProps) => {
           role="group"
           cursor="pointer"
           _hover={{
-            bg: 'cyan.400',
+            bg: 'blue.600',
             color: 'white',
           }}
           {...rest}>

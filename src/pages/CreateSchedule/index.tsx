@@ -1,18 +1,32 @@
 import {
   Flex,
   Box,
-  FormControl,
-  FormLabel,
-  Input,
   Stack,
   Button,
   Heading,
   useColorModeValue,
 } from '@chakra-ui/react';
+import z from "zod";
+import { Input } from '../../components/Input';
+import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const scheduleSchema = z.object({
+    namePatient: z.string().min(1),
+    birthDatePatient: z.coerce.date(),
+    dateTime: z.coerce.date(),
+  });
 
 export function CreateSchedule() {
-  const currentDateTime = new Date().toISOString().replace('Z', '');
-  const [currentDate] = new Date().toISOString().split('T')
+  const { formState, handleSubmit, register } = useForm({
+    mode: "onBlur",
+    resolver: zodResolver(scheduleSchema),
+  });
+
+  const onSubmit: SubmitHandler<FieldValues> = (values) => {
+    console.log(values)
+  }
+
   return (
     <Flex
       minH={'100vh'}
@@ -30,25 +44,40 @@ export function CreateSchedule() {
           boxShadow={'lg'}
           p={8}>
           <Stack spacing={4}>
-            <FormControl id="name" isRequired>
-                <FormLabel>Nome do Paciente</FormLabel>
-                <Input type="text" />
-            </FormControl>
-            <FormControl id="birthDate">
-                <FormLabel>Data de Nascimento</FormLabel>
-                <Input type="date" max={currentDate} />
-            </FormControl>
-            <FormControl id="dateTime">
-                <FormLabel>Horário do Agendamento</FormLabel>
-                <Input type="datetime-local" />
-            </FormControl>
-            
+            <Input 
+                id="namePatient"
+                errors={formState.errors}
+                register={register("namePatient")}
+                label="Nome do Paciente"
+                placeholder="Digite o nome do paciente"
+                isRequired={true}
+            />
+            <Input 
+                id="birthDatePatient"
+                errors={formState.errors}
+                register={register("birthDatePatient")}
+                label="Data de Nascimento"
+                type='date'
+                isRequired={true}
+            />
+            <Input 
+                id="dateTime"
+                errors={formState.errors}
+                register={register("dateTime")}
+                label="Horário do Agendamento"
+                type='datetime-local'
+                isRequired={true}
+            />
+
             <Stack spacing={10} pt={2}>
               <Button
-                loadingText="Submitting"
+                loadingText="Cadastrando..."
                 size="lg"
+                onClick={handleSubmit(onSubmit)}
                 bg={'blue.500'}
                 color={'white'}
+                isLoading={formState.isSubmitting}
+                isDisabled={!formState.isValid}
                 _hover={{
                   bg: 'blue.600',
                 }}>

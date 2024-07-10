@@ -4,7 +4,7 @@ import AppRoutes from './routes'
 
 function App() {
   return (
-    <ChakraProvider>
+    <ChakraProvider  toastOptions={{ defaultOptions: { position: 'top-right', isClosable: true, duration: 3000, variant: 'left-accent' } }}>
       <AppRoutes />
     </ChakraProvider>
       

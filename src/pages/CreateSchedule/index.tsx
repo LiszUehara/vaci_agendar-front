@@ -5,11 +5,13 @@ import {
   Button,
   Heading,
   useColorModeValue,
+  useToast,
 } from '@chakra-ui/react';
 import z from "zod";
 import { Input } from '../../components/Input';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import fetcher from '../../services/api';
 
 const scheduleSchema = z.object({
     namePatient: z.string().min(1),
@@ -18,13 +20,33 @@ const scheduleSchema = z.object({
   });
 
 export function CreateSchedule() {
-  const { formState, handleSubmit, register } = useForm({
+  const { formState, handleSubmit, register, reset } = useForm({
     mode: "onBlur",
     resolver: zodResolver(scheduleSchema),
   });
+  const toast = useToast()
 
-  const onSubmit: SubmitHandler<FieldValues> = (values) => {
-    console.log(values)
+  const onSubmit: SubmitHandler<FieldValues> = async (values) => {    
+    await fetcher.post('/api/schedule', {
+        status: 'unrealized',
+        patient: {
+            name: values.namePatient,
+            birthDate: values.birthDatePatient,
+        },
+        dateTime: values.dateTime,
+        note: ''
+    }).then(() =>{
+        toast({
+            title: "Agendamento realizado",
+            status: 'success',
+        })
+        reset({ namePatient: '', birthDatePatient: null, dateTime: null })
+    }).catch(res =>{
+        toast({
+            title: res.cause,
+            status: 'error',
+        })})
+
   }
 
   return (

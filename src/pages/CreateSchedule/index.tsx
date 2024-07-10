@@ -12,6 +12,7 @@ import { Input } from '../../components/Input';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import fetcher from '../../services/api';
+import { InputDateTime } from '../../components/Input/InputDateTime';
 
 const scheduleSchema = z.object({
     namePatient: z.string().min(1),
@@ -19,8 +20,8 @@ const scheduleSchema = z.object({
     dateTime: z.coerce.date(),
   });
 
-export function CreateSchedule() {
-  const { formState, handleSubmit, register, reset } = useForm({
+function CreateSchedule() {
+  const { control, formState, handleSubmit, register, reset } = useForm({
     mode: "onBlur",
     resolver: zodResolver(scheduleSchema),
   });
@@ -74,21 +75,29 @@ export function CreateSchedule() {
                 placeholder="Digite o nome do paciente"
                 isRequired={true}
             />
-            <Input 
+            <InputDateTime
+                control={control}
                 id="birthDatePatient"
+                name="birthDatePatient"
                 errors={formState.errors}
-                register={register("birthDatePatient")}
+                placeholderText='Informe a data de nascimento do paciente'
                 label="Data de Nascimento"
                 type='date'
                 isRequired={true}
             />
-            <Input 
-                id="dateTime"
-                errors={formState.errors}
-                register={register("dateTime")}
-                label="Horário do Agendamento"
-                type='datetime-local'
-                isRequired={true}
+            <InputDateTime
+              control={control}
+              id="dateTime"
+              name="dateTime"
+              errors={formState.errors}
+              label="Horário do Agendamento"
+              placeholderText='Informe o horário do agendamento'
+              type='datetime-local'
+              isRequired={true}
+              timeFormat="HH:mm"
+              dateFormat="dd/MM/yyyy - h:mm aa"
+              showTimeSelect
+              timeIntervals={60}
             />
 
             <Stack spacing={10} pt={2}>
@@ -112,3 +121,5 @@ export function CreateSchedule() {
     </Flex>
   )
 }
+
+export default CreateSchedule

@@ -7,7 +7,7 @@ import {
   } from "@chakra-ui/react";
 import { FieldErrors, FieldValues, UseFormRegisterReturn } from "react-hook-form";
   
-interface InputProps extends InputChackraProps{
+export interface InputProps extends InputChackraProps{
     id: string;
     label?: string;
     errors?: FieldErrors<FieldValues>;

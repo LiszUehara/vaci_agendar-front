@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { Suspense  } from 'react';
 import { Spinner } from '@chakra-ui/react';
 import Sidebar from './components/Sidebar';
-import { CreateSchedule } from './pages/CreateSchedule';
+import CreateSchedule from './pages/CreateSchedule';
 
 const AppRoutes = () => (
   <BrowserRouter>

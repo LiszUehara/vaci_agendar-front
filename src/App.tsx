@@ -1,6 +1,7 @@
 import './App.css'
 import { ChakraProvider } from '@chakra-ui/react'
 import AppRoutes from './routes'
+import "react-datepicker/dist/react-datepicker.css";
 
 function App() {
   return (

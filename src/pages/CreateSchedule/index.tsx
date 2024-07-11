@@ -9,29 +9,53 @@ import {
 } from '@chakra-ui/react';
 import z from "zod";
 import { Input } from '../../components/Input';
-import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
+import { FieldValues, SubmitHandler, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import fetcher from '../../services/api';
 import { InputDateTime } from '../../components/Input/InputDateTime';
+import { validateCPF } from 'validations-br';
+import { useEffect, useState } from 'react';
 
 const scheduleSchema = z.object({
-    namePatient: z.string().min(1),
-    birthDatePatient: z.coerce.date(),
-    dateTime: z.coerce.date(),
+    namePatient: z.string().refine((value) => /^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:[\s'-][A-Za-zÀ-ÖØ-öø-ÿ]+)*$/.test(value ?? ""), 'Nome inválido, por favor tente novamente'),
+    CPFPatient: z.string().refine((value) => validateCPF(value), 'CPF inválido'),
+    birthDatePatient: z.date(),
+    dateTime: z.date(),
   });
 
 function CreateSchedule() {
-  const { control, formState, handleSubmit, register, reset } = useForm({
+  const [firstLoad, setIsFirstLoad] = useState(true);
+  const { control, formState, handleSubmit, register, reset, setValue, setError
+   } = useForm({
     mode: "onBlur",
     resolver: zodResolver(scheduleSchema),
   });
-  const toast = useToast()
 
-  const onSubmit: SubmitHandler<FieldValues> = async (values) => {    
+  const [namePatient, CPFPatient, birthDatePatient, dateTime] = useWatch({control, name: ['namePatient', 'CPFPatient', 'birthDatePatient', 'dateTime'] });
+  
+  useEffect(()=> {
+    const form = JSON.parse(localStorage.getItem('form') ?? '');
+    setValue('namePatient', form.namePatient);
+    setValue('CPFPatient', form.CPFPatient);
+    setValue('birthDatePatient', (form.birthDatePatient));
+    setValue('dateTime', form.dateTime);
+  }, []);
+  useEffect(()=> {
+    if(!firstLoad){
+      localStorage.setItem('form', JSON.stringify({namePatient, CPFPatient, birthDatePatient: birthDatePatient, dateTime}));
+    }else{
+      setIsFirstLoad(false);
+    }
+  }, [namePatient, CPFPatient, birthDatePatient, dateTime]);
+  
+  const toast = useToast();
+
+  const onSubmit: SubmitHandler<FieldValues> = async (values) => {
     await fetcher.post('/api/schedule', {
         status: 'unrealized',
         patient: {
             name: values.namePatient,
+            cpf: values.CPFPatient,
             birthDate: values.birthDatePatient,
         },
         dateTime: values.dateTime,
@@ -41,7 +65,8 @@ function CreateSchedule() {
             title: "Agendamento realizado",
             status: 'success',
         })
-        reset({ namePatient: '', birthDatePatient: null, dateTime: null })
+        localStorage.setItem('form','')
+        reset({ namePatient: '', CPFPatient:null, birthDatePatient: null, dateTime: null })
     }).catch(res =>{
         toast({
             title: res.cause,
@@ -75,17 +100,30 @@ function CreateSchedule() {
                 placeholder="Digite o nome do paciente"
                 isRequired={true}
             />
+            <Input 
+                id="CPFPatient"
+                errors={formState.errors}
+                register={register("CPFPatient")}
+                label="CPF do Paciente"
+                placeholder="Digite o cpf do paciente"
+                isRequired={true}
+            />
             <InputDateTime
                 control={control}
+                selected={birthDatePatient}
                 id="birthDatePatient"
                 name="birthDatePatient"
                 errors={formState.errors}
                 placeholderText='Informe a data de nascimento do paciente'
                 label="Data de Nascimento"
                 type='date'
+                dateFormat="dd/MM/yyyy"
                 isRequired={true}
+                maxDate={new Date()}
             />
             <InputDateTime
+              selected={dateTime}
+              minDate={new Date()}
               control={control}
               id="dateTime"
               name="dateTime"
@@ -98,6 +136,8 @@ function CreateSchedule() {
               dateFormat="dd/MM/yyyy - h:mm aa"
               showTimeSelect
               timeIntervals={60}
+              minTime={new Date(0, 0, 0, 8, 0)} // 08:00am
+              maxTime={new Date(0, 0, 0, 22, 0)} 
             />
 
             <Stack spacing={10} pt={2}>
@@ -108,7 +148,7 @@ function CreateSchedule() {
                 bg={'blue.500'}
                 color={'white'}
                 isLoading={formState.isSubmitting}
-                isDisabled={!formState.isValid}
+                //isDisabled={!formState.isValid}
                 _hover={{
                   bg: 'blue.600',
                 }}>

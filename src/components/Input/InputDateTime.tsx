@@ -11,11 +11,15 @@ interface InputDateTimeProps extends InputProps{
   timeIntervals?: number
   showTimeSelect?: boolean
   placeholderText?: string
-
+  minDate?: Date;
+  maxDate?: Date;
+  minTime?: Date;
+  maxTime?: Date;
+  selected?: Date;
 }
 
 export function InputDateTime({
-   control,name='', ...props
+   control,name='', selected, ...props
 }:InputDateTimeProps) {
 
   return (
@@ -23,15 +27,14 @@ export function InputDateTime({
     control={control}
     name={name}
     render={({ field }) => (
-      
       <Input
-      as={DatePicker}
-      locale={ptBR}
-      {...props}
-      sx={{w: '100%'}}
-      onChange={(date) => field.onChange(date)}
-      //@ts-ignore
-      selected={field.value}
+        as={DatePicker}
+        locale={ptBR}
+        {...props}
+        sx={{w: '100%'}}
+        onChange={(date) => field.onChange(date)}
+        //@ts-ignore
+        selected={selected || field.value}
       />
    )}
   />

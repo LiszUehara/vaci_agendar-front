@@ -3,6 +3,7 @@ import { Suspense  } from 'react';
 import { Spinner } from '@chakra-ui/react';
 import Sidebar from './components/Sidebar';
 import CreateSchedule from './pages/CreateSchedule';
+import { ListSchedule } from './pages/ListSchedule';
 
 const AppRoutes = () => (
   <BrowserRouter>
@@ -18,7 +19,7 @@ const AppRoutes = () => (
           </>
         }
       >
-        <Route element={<>Pagina Inicial</>} path='/' />
+        <Route element={<ListSchedule/>} path='/' />
         <Route element={<CreateSchedule />} path='/include' />
       </Route>
     </Routes>

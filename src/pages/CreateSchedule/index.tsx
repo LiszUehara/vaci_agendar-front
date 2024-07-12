@@ -5,7 +5,6 @@ import {
   Button,
   Heading,
   useColorModeValue,
-  useToast,
 } from '@chakra-ui/react';
 import z from "zod";
 import { Input } from '../../components/Input';
@@ -14,9 +13,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import fetcher from '../../services/api';
 import { InputDateTime } from '../../components/Input/InputDateTime';
 import { validateCPF } from 'validations-br';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { AlertContext } from '../../components/contexts/alerts';
 
-const scheduleSchema = z.object({
+export const scheduleSchema = z.object({
     namePatient: z.string().refine((value) => /^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:[\s'-][A-Za-zÀ-ÖØ-öø-ÿ]+)*$/.test(value ?? ""), 'Nome inválido, por favor tente novamente'),
     CPFPatient: z.string().refine((value) => validateCPF(value), 'CPF inválido'),
     birthDatePatient: z.date(),
@@ -25,11 +25,12 @@ const scheduleSchema = z.object({
 
 function CreateSchedule() {
   const [firstLoad, setIsFirstLoad] = useState(true);
-  const { control, formState, handleSubmit, register, reset, setValue, setError
+  const { control, formState, handleSubmit, register, reset, setValue
    } = useForm({
     mode: "onBlur",
     resolver: zodResolver(scheduleSchema),
   });
+  const { success, error } = useContext(AlertContext);
 
   const [namePatient, CPFPatient, birthDatePatient, dateTime] = useWatch({control, name: ['namePatient', 'CPFPatient', 'birthDatePatient', 'dateTime'] });
   
@@ -37,8 +38,8 @@ function CreateSchedule() {
     const form = JSON.parse(localStorage.getItem('form') ?? '');
     setValue('namePatient', form.namePatient);
     setValue('CPFPatient', form.CPFPatient);
-    setValue('birthDatePatient', (form.birthDatePatient));
-    setValue('dateTime', form.dateTime);
+    setValue('birthDatePatient', form.birthDatePatient ? new Date(form.birthDatePatient) : null);
+    setValue('dateTime', form.dateTime ? new Date(form.dateTime) : null);
   }, []);
   useEffect(()=> {
     if(!firstLoad){
@@ -48,8 +49,6 @@ function CreateSchedule() {
     }
   }, [namePatient, CPFPatient, birthDatePatient, dateTime]);
   
-  const toast = useToast();
-
   const onSubmit: SubmitHandler<FieldValues> = async (values) => {
     await fetcher.post('/api/schedule', {
         status: 'unrealized',
@@ -61,17 +60,11 @@ function CreateSchedule() {
         dateTime: values.dateTime,
         note: ''
     }).then(() =>{
-        toast({
-            title: "Agendamento realizado",
-            status: 'success',
-        })
+        success("Agendamento realizado")
         localStorage.setItem('form','')
         reset({ namePatient: '', CPFPatient:null, birthDatePatient: null, dateTime: null })
     }).catch(res =>{
-        toast({
-            title: res.cause,
-            status: 'error',
-        })})
+        error(res.cause)})
 
   }
 

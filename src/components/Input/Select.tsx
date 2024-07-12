@@ -40,7 +40,7 @@ export interface SelectProps extends SelectChackraProps{
           boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)",
         }}
         >
-        {items.map(({value, label})=><option value={value}>{label}</option>)}
+        {items.map(({value, label})=><option value={value} key={value}>{label}</option>)}
       </SelectChacka>
       {errors && <FormErrorMessage>{typeof errors[id]?.message  === 'string' ? errors[id]?.message : ''}</FormErrorMessage>}
     </FormControl>

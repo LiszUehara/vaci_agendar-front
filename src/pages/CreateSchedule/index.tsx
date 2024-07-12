@@ -38,8 +38,8 @@ function CreateSchedule() {
     const form = JSON.parse(localStorage.getItem('form') ?? '');
     setValue('namePatient', form.namePatient);
     setValue('CPFPatient', form.CPFPatient);
-    setValue('birthDatePatient', (form.birthDatePatient));
-    setValue('dateTime', form.dateTime);
+    setValue('birthDatePatient', form.birthDatePatient ? new Date(form.birthDatePatient) : null);
+    setValue('dateTime', form.dateTime ? new Date(form.dateTime) : null);
   }, []);
   useEffect(()=> {
     if(!firstLoad){

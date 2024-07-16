@@ -23,12 +23,7 @@ async function fetcher(url: URL | string, options: RequestInit = {}) {
     return data;
   }
 
-  const error = new FetcherError();
-
-  error.cause = data.message;
-  error.original = data;
-
-  throw error;
+  return { error: true, cause: data.message,  original: data };
 }
 
 fetcher.delete = function (url: string | URL) {

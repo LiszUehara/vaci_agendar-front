@@ -27,7 +27,7 @@ export interface TextareaProps extends TextareaChackraProps{
     const isInvalid = errors && !!errors[id];
     return (
     <FormControl id={id} isRequired={isRequired} isInvalid={isInvalid}>
-      <FormLabel>{label}</FormLabel>
+      <FormLabel sx={{color: 'blue.600'}}>{label}</FormLabel>
       <TextareaChacka
       {...props}
         disabled={disabled}

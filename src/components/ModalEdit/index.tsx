@@ -8,6 +8,7 @@ import {
     ModalCloseButton,
     Button,
     Stack,
+    useColorModeValue,
   } from '@chakra-ui/react'
 import { Schedule } from '../../types/list';
 import { Input } from '../Input';
@@ -15,7 +16,7 @@ import { InputDateTime } from '../Input/InputDateTime';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import fetcher from '../../services/api';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import z from 'zod'
 import { validateCPF } from 'validations-br';
 import { TextArea } from '../Input/TextArea';
@@ -42,6 +43,10 @@ export function ModalEdit({isOpen, onClose, item}: IModalEdit) {
      mode: "onBlur",
      resolver: zodResolver(scheduleSchema),
    });
+   const [subtitle, setSubtitle] = useState('');
+   useEffect(()=> {
+    setSubtitle('')
+   }, [])
    useEffect(()=> {
     setValue('namePatient', item.patient.name);
     setValue('CPFPatient', item.patient.cpf);
@@ -62,39 +67,48 @@ export function ModalEdit({isOpen, onClose, item}: IModalEdit) {
         status: values.status,
         dateTime: values.dateTime,
         note: values.note ?? ''
-    }).then(() =>{
-        success("Agendamento realizado")
-        onClose();
-    }).catch(res =>{
-        error(res.cause)})
-
+    }).then((res) =>{
+        if(res.error){
+          setSubtitle(' - '+res.cause)
+          error(res.cause)          
+        } else {
+          setSubtitle(' - Agendamento realizado')
+          success("Agendamento realizado")
+          onClose();
+        }
+      })
   }
     return (
       <>  
         <Modal isOpen={isOpen} onClose={onClose} motionPreset='slideInBottom'>
           <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Atualização de Agendamento</ModalHeader>
-            <ModalCloseButton />
+          <ModalContent bgColor={useColorModeValue('white', 'gray.800')} paddingTop={2}>
+              <ModalHeader fontSize={"2xl"} color={useColorModeValue('gray.600', 'gray.400')}>Atualização de Agendamento{subtitle}</ModalHeader>
+              <ModalCloseButton />
+            <Stack borderBottom={'1px solid'} marginX={6} marginTop={1} marginBottom={4}>
+            </Stack>
             <ModalBody>
                 <Stack spacing={4}>
                     <Input 
                         id="namePatient"
+                        aria-label='name'
                         errors={formState.errors}
                         register={register("namePatient")}
-                        label="Nome do Paciente"
+                        label="Nome"
                         placeholder="Digite o nome do paciente"
                         isRequired={true}
                     />
-                    <Input 
+                    <Input
                         id="CPFPatient"
+                        aria-label='cpf'
                         errors={formState.errors}
                         register={register("CPFPatient")}
-                        label="CPF do Paciente"
+                        label="CPF"
                         placeholder="Digite o cpf do paciente"
                         isRequired={true}
                     />
                     <InputDateTime
+                        aria-label='birthDate'
                         control={control}
                         //selected={birthDatePatient}
                         id="birthDatePatient"

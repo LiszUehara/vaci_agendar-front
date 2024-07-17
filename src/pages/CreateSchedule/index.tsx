@@ -31,6 +31,7 @@ function CreateSchedule() {
     resolver: zodResolver(scheduleSchema),
   });
   const { success, error } = useContext(AlertContext);
+  const [title, setTitle] = useState('Cadastro de Agendamentos');
 
   const [namePatient, CPFPatient, birthDatePatient, dateTime] = useWatch({control, name: ['namePatient', 'CPFPatient', 'birthDatePatient', 'dateTime'] });
   
@@ -59,12 +60,20 @@ function CreateSchedule() {
         },
         dateTime: values.dateTime,
         note: ''
-    }).then(() =>{
+    }).then((res) =>{
+      if(res.error){
+        setTitle(res.cause)
+        error(res.cause)          
+      } else {
+        setTitle('Agendamento realizado')
         success("Agendamento realizado")
         localStorage.setItem('form','')
         reset({ namePatient: '', CPFPatient:null, birthDatePatient: null, dateTime: null })
-    }).catch(res =>{
-        error(res.cause)})
+        setTimeout(()=> {
+          setTitle('Cadastro de Agendamentos')
+        }, 5000)
+      }
+    })
 
   }
 
@@ -76,7 +85,7 @@ function CreateSchedule() {
       <Stack spacing={8} px={6}>
         <Stack align={'center'}>
           <Heading fontSize={'4xl'} textAlign={'center'}>
-            Cadastro de Agendamentos
+            {title}
           </Heading>
         </Stack>
         <Box
@@ -87,13 +96,15 @@ function CreateSchedule() {
           <Stack spacing={4}>
             <Input 
                 id="namePatient"
+                aria-label='name'
                 errors={formState.errors}
                 register={register("namePatient")}
                 label="Nome do Paciente"
                 placeholder="Digite o nome do paciente"
                 isRequired={true}
-            />
+                />
             <Input 
+                aria-label='cpf'
                 id="CPFPatient"
                 errors={formState.errors}
                 register={register("CPFPatient")}

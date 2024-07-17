@@ -7,36 +7,63 @@ import fetcher from '../../services/api'
 jest.mock('../../services/api')
 jest.mock('../../utils/env', () => ({VITE_BACKEND_URL: ''}))
 
+//@ts-ignore
+global.JSON = {
+  parse: (_value: string)=> ({}),
+  stringify: (_value: any)=> '',
+};
+
 describe('<Create />', () => {
   user.setup();
-  it('all inputs on screen', async () => {
-    ((fetcher.post as jest.Mock)).mockResolvedValueOnce(() => Promise.resolve('test1234'))
+  it('Validate Inputs', async () => {
     customRender(<Create/>)
-    const nameInput = screen.getByRole('textbox', { name: /Nome do Paciente/i });
-    const birthDateInput = screen.getByRole('textbox', { name: /Data de Nascimento/i });
-    const dateTimeInput = screen.getByRole('textbox', { name: /Horário do Agendamento/i });
-    expect(nameInput);
-    expect(birthDateInput);
-    expect(dateTimeInput);
+    const inputName = screen.getByRole('textbox', { name: /name/i });
+    const inputCpf = screen.getByRole('textbox', { name: /cpf/i })
+    const button = screen.getByRole('button', { name: /Cadastrar/i })
+
+    fireEvent.change(inputName, { target: { value: 'John2 Smith' } });
+    fireEvent.change(inputCpf, { target: { value: '01201201212' } });
+    fireEvent.click(button);
+    const errorInput = await screen.findByText(/Nome inválido, por favor tente novamente/i)
+    const errorInputCpf = await screen.findByText(/CPF inválido/i)
+
+    expect(errorInput).toBeInTheDocument();
+    expect(errorInputCpf).toBeInTheDocument();
   })
-  it('submitting', async () => {
-    ((fetcher.post as jest.Mock)).mockResolvedValueOnce(() => Promise.resolve({}))
+  it('Submit with Success', async () => {
+    fetcher.post = jest.fn().mockResolvedValue(() => Promise.resolve('success'))
+
     customRender(<Create/>)
     const date = new Date('2023-12-12T10:00')
-    const nameInput = screen.getByRole('textbox', { name: /Nome do Paciente/i });
+    const nameInput = screen.getByRole('textbox', { name: /name/i });
     fireEvent.change(nameInput, { target: { value: 'Ana Maria' } });
+    const cpfInput = screen.getByRole('textbox', { name: /cpf/i });
+    fireEvent.change(cpfInput, { target: { value: '95329471087' } });
     const birthDateInput = screen.getByRole('textbox', { name: /Data de Nascimento/i });
     fireEvent.change(birthDateInput, { target: { value: date } });
     const dateTimeInput = screen.getByRole('textbox', { name: /Horário do Agendamento/i });
-    fireEvent.change(dateTimeInput, { target: { value: date } });
+    fireEvent.change(dateTimeInput, { target: { value: new Date() } });
     const button = screen.getByRole('button', { name: /Cadastrar/i })
-    //expect(button).toBeDisabled()
-
+    
     fireEvent.click(button);
-    //expect(screen.queryByText(/Carregando/i)).toBeNull()
-    //expect(nameInput);
-    expect(screen.getByDisplayValue('12/12/2023')).toBeInTheDocument();
-    //expect(birthDateInput);
-    //expect(dateTimeInput);
+    expect(await screen.findByText(/Agendamento realizado/i )).toBeInTheDocument();
+  })
+  it('Submit with Error', async () => {
+    fetcher.post = jest.fn().mockResolvedValue({ cause: 'Error', error: true});
+
+    customRender(<Create/>)
+    const date = new Date('2023-12-12T10:00')
+    const nameInput = screen.getByRole('textbox', { name: /name/i });
+    fireEvent.change(nameInput, { target: { value: 'Ana Maria' } });
+    const cpfInput = screen.getByRole('textbox', { name: /cpf/i });
+    fireEvent.change(cpfInput, { target: { value: '95329471087' } });
+    const birthDateInput = screen.getByRole('textbox', { name: /Data de Nascimento/i });
+    fireEvent.change(birthDateInput, { target: { value: date } });
+    const dateTimeInput = screen.getByRole('textbox', { name: /Horário do Agendamento/i });
+    fireEvent.change(dateTimeInput, { target: { value: new Date() } });
+    const button = screen.getByRole('button', { name: /Cadastrar/i })
+    
+    fireEvent.click(button);
+    expect(await screen.findByText(/Error/i )).toBeInTheDocument();
   })
 })

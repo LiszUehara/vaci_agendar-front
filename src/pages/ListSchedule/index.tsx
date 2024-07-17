@@ -9,6 +9,7 @@ import {
     List,
     useColorModeValue,
     useDisclosure,
+    Spinner,
   } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
 import { FiCheck, FiClock, FiEdit, FiFileText, FiGift, FiUser } from "react-icons/fi";
@@ -44,6 +45,8 @@ function getStatus(status: string | undefined){
 export const ListSchedule = () => {
   const { error } = useContext(AlertContext);
   const modalEditDisclosure = useDisclosure()
+  const [errorText, setErrorText] = useState<string | undefined>();
+  const [loading, setLoading] = useState(true);
   const [list, setList] = useState<Schedule[]>([]);
   const [item, setItem] = useState<Schedule>({dateTime: new Date(), id: '', patient: { birthDate: new Date(), cpf: '', name: '', id: ''}});
   const { control, formState, register } = useForm({
@@ -54,32 +57,52 @@ export const ListSchedule = () => {
   useEffect(()=>{
     if(!modalEditDisclosure.isOpen){
       setList(JSON.parse(localStorage.getItem('list') ?? ''))
-      fetcher('/api/schedule')
+      setErrorText(undefined)
+      setLoading(true)
+      fetcher.get('/api/schedule')
       .then((res)=> {
-        setList(res.items);
-        localStorage.setItem('list', JSON.stringify(res.items));
+        setLoading(false)
+        if(res.error){
+          setErrorText(res.cause)
+          error(res.cause)          
+        } else {
+          localStorage.setItem('list', JSON.stringify(res.items));
+          setList(res.items)
+        }
       })
-      .catch(res =>{
-        error(res.cause)})
     }
   },[modalEditDisclosure.isOpen]);
   useEffect(()=>{
     if((order && order!=='asc') || search){
-      fetcher(`/api/schedule?order=${order}&search=${search}`)
+      setErrorText(undefined)
+      setLoading(true)
+      fetcher.get(`/api/schedule?order=${order}&search=${search}`)
       .then((res)=> {
-        setList(res.items);
+        setLoading(false)
+        if(res.error){
+          setErrorText(res.cause)
+          error(res.cause)          
+        } else {
+          setList(res.items)
+        }
       })
-      .catch(res =>{
-        error(res.cause)})
     } else {
       setList(JSON.parse(localStorage.getItem('list') ?? ''))
-    fetcher('/api/schedule')
-      .then((res)=> {
-        setList(res.items)
-        localStorage.setItem('list', JSON.stringify(res.items));
-      })
-      .catch(res =>{
-        error(res.cause)})
+      setErrorText(undefined)
+      setLoading(true)
+
+      fetcher.get('/api/schedule')
+        .then((res)=> {
+          setLoading(false)
+
+          if(res.error){
+            setErrorText(res.cause)
+            error(res.cause)          
+          } else {
+            setList(res.items)
+            localStorage.setItem('list', JSON.stringify(res.items));
+          }
+        })
     }
   },[order, search]);
   return (
@@ -98,13 +121,19 @@ export const ListSchedule = () => {
             ]}/>
         <Input
           id="search"
+          aria-label="Pesquisa cpf"
           errors={formState.errors}
           register={register("search")}
           label="Pesquisar por CPF"
         />
       </Stack>
+      {(loading) ? 
+      <Flex fontSize={20} gap={2} alignItems={`center`}><Spinner color="blue.500"/>Carregando...</Flex>
+      : ''}
+
+      {errorText}
       <Flex py={6} px={4} rowGap={8} justifyContent={"flex-start"} flexWrap={'wrap'} display={'flex'} columnGap={8}>
-        {list.map(({id, patient, dateTime, status, note})=>(
+        {!!list.length && list.map(({id, patient, dateTime, status, note})=>(
           <Stack
             key={id} 
             width={320}
@@ -120,12 +149,12 @@ export const ListSchedule = () => {
                 display={"flex"}
                 borderBottom={'1px solid'}
                 paddingBottom={2}
-                borderColor={'white'}
+                borderColor={useColorModeValue('gray.600', 'white')}
                 justifyContent={"space-between"}
               >
                 Agendamento
                 <IconButton
-                  aria-label="botão de editar"
+                  aria-label={`editar agendamento ${patient.name}`}
                   variant="link"
                   colorScheme="blue.900"
                   size="xl"

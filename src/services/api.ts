@@ -32,6 +32,10 @@ fetcher.delete = function (url: string | URL) {
   });
 };
 
+fetcher.get = function (url: string | URL) {
+  return fetcher(url);
+};
+
 fetcher.post = function (url: string | URL, data: unknown) {
   return fetcher(url, {
     body: JSON.stringify(data),

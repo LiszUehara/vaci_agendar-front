@@ -16,6 +16,7 @@ interface InputDateTimeProps extends InputProps{
   minTime?: Date;
   maxTime?: Date;
   selected?: Date;
+  filterTime?: (value: string | Date) => boolean
 }
 
 export function InputDateTime({

@@ -52,6 +52,14 @@ function CreateSchedule() {
     }
   }, [namePatient, CPFPatient, birthDatePatient, dateTime]);
   
+
+  const filterPassedTime = (time: string | Date) => {
+    const selectedDate = new Date(time);
+    return new Date().getTime() < selectedDate.getTime();
+  };
+
+
+
   const onSubmit: SubmitHandler<FieldValues> = async (values) => {
     await fetcher.post('/api/schedule', {
         status: 'unrealized',
@@ -127,6 +135,7 @@ function CreateSchedule() {
                 isRequired={true}
                 maxDate={new Date()}
             />
+
             <InputDateTime
               selected={dateTime}
               minDate={new Date()}
@@ -142,6 +151,7 @@ function CreateSchedule() {
               dateFormat="dd/MM/yyyy - h:mm aa"
               showTimeSelect
               timeIntervals={60}
+              filterTime={filterPassedTime}
               minTime={new Date(0, 0, 0, 8, 0)} // 08:00am
               maxTime={new Date(0, 0, 0, 22, 0)} 
             />

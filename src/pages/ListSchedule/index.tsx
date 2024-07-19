@@ -56,7 +56,7 @@ export const ListSchedule = () => {
 
   useEffect(()=>{
     if(!modalEditDisclosure.isOpen){
-      setList(JSON.parse(localStorage.getItem('list') ?? ''))
+      setList(localStorage.getItem('list') ? JSON.parse(localStorage.getItem('list') ?? ''): [])
       setErrorText(undefined)
       setLoading(true)
       fetcher.get('/api/schedule')
@@ -87,7 +87,9 @@ export const ListSchedule = () => {
         }
       })
     } else {
-      setList(JSON.parse(localStorage.getItem('list') ?? ''))
+      setList(localStorage.getItem('list') 
+      ? JSON.parse(localStorage.getItem('list') ?? '')
+      : [])
       setErrorText(undefined)
       setLoading(true)
 

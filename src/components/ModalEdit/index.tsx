@@ -48,6 +48,7 @@ export function ModalEdit({isOpen, onClose, item}: IModalEdit) {
     setSubtitle('')
    }, [])
    useEffect(()=> {
+    setSubtitle(``)
     setValue('namePatient', item.patient.name);
     setValue('CPFPatient', item.patient.cpf);
     setValue('birthDatePatient', new Date(item.patient.birthDate));

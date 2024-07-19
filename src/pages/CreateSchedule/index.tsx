@@ -36,11 +36,13 @@ function CreateSchedule() {
   const [namePatient, CPFPatient, birthDatePatient, dateTime] = useWatch({control, name: ['namePatient', 'CPFPatient', 'birthDatePatient', 'dateTime'] });
   
   useEffect(()=> {
-    const form = JSON.parse(localStorage.getItem('form') ?? '');
-    setValue('namePatient', form.namePatient);
-    setValue('CPFPatient', form.CPFPatient);
-    setValue('birthDatePatient', form.birthDatePatient ? new Date(form.birthDatePatient) : null);
-    setValue('dateTime', form.dateTime ? new Date(form.dateTime) : null);
+    const form = JSON.parse(localStorage.getItem('form') ?? '{}');
+    if(form){
+      setValue('namePatient', form.namePatient);
+      setValue('CPFPatient', form.CPFPatient);
+      setValue('birthDatePatient', form.birthDatePatient ? new Date(form.birthDatePatient) : null);
+      setValue('dateTime', form.dateTime ? new Date(form.dateTime) : null);
+    }
   }, []);
   useEffect(()=> {
     if(!firstLoad){
